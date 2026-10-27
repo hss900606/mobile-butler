@@ -17,8 +17,6 @@ object MbRadius {
     val sm = 12.dp
     val md = 16.dp
     val lg = 28.dp
-
-    // 50% of the component's dimensions
     val full = RoundedCornerShape(50)
 }
 
@@ -27,5 +25,5 @@ val MbShapes = Shapes(
     small = RoundedCornerShape(MbRadius.sm),
     medium = RoundedCornerShape(MbRadius.md),
     large = RoundedCornerShape(MbRadius.lg),
-    extraLarge = MbRadius.full
+    extraLarge = RoundedCornerShape(MbRadius.lg)
 )

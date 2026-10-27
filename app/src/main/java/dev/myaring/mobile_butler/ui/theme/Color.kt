@@ -5,7 +5,9 @@ import androidx.compose.ui.graphics.Color
 // Brand colors
 val MbBackground = Color(0xFF0E1233)
 val MbSurfaceContainer = Color(0xFF1C2268)
+val MbSecondaryContainer = Color(0xFF38449A)
 val MbPrimary = Color(0xFFFFBB00)
+val MbInversePrimary = Color(0xFF7A5600)
 val MbRecordDone = Color(0xFFC79A2E)
 
 // Text colors

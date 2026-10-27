@@ -9,9 +9,13 @@ import androidx.compose.ui.platform.LocalContext
 private val MbDarkColorScheme = darkColorScheme(
     primary = MbPrimary,
     onPrimary = MbOnPrimary,
+    inversePrimary = MbInversePrimary,
 
     primaryContainer = MbSurfaceContainer,
     onPrimaryContainer = MbOnSurface,
+
+    secondaryContainer = MbSecondaryContainer,
+    onSecondaryContainer = MbOnSurface,
 
     secondary = MbOnSurfaceVariant,
     onSecondary = MbBackground,
@@ -24,6 +28,8 @@ private val MbDarkColorScheme = darkColorScheme(
 
     surface = MbBackground,
     onSurface = MbOnSurface,
+    inverseSurface = MbOnSurface,
+    inverseOnSurface = MbSurfaceContainer,
 
     surfaceVariant = MbSurfaceVariant,
     onSurfaceVariant = MbOnSurfaceVariant,
@@ -31,6 +37,7 @@ private val MbDarkColorScheme = darkColorScheme(
     surfaceContainer = MbSurfaceContainer,
     surfaceContainerLow = MbBackground,
     surfaceContainerHigh = MbSurfaceVariant,
+    surfaceContainerHighest = MbSurfaceVariant,
 
     surfaceBright = MbSurfaceVariant,
     surfaceDim = MbBackground,
@@ -44,7 +51,6 @@ private val MbDarkColorScheme = darkColorScheme(
 
 @Composable
 fun MobilebutlerTheme(
-    darkTheme: Boolean = true,
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
