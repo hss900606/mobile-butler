@@ -344,7 +344,9 @@ Figma 2차 시안 페이지 아래쪽 보드 세 곳에 있습니다.
 | --- | --- | --- | --- |
 | Brand | `MbBackground` | `background` | `#0E1233` |
 | Brand | `MbSurfaceContainer` | `surfaceContainer` | `#1C2268` |
+| Brand | `MbSecondaryContainer` | `secondaryContainer` | `#38449A` |
 | Brand | `MbPrimary` | `primary` | `#FFBB00` |
+| Brand | `MbInversePrimary` | `inversePrimary` | `#7A5600` |
 | Brand | `MbRecordDone` | `tertiary` | `#C79A2E` |
 | Text | `MbOnBackground` | `onBackground` | `#FFFFFF` |
 | Text | `MbOnSurface` | `onSurface` | `#F4F4FA` |
@@ -360,7 +362,12 @@ Figma 2차 시안 페이지 아래쪽 보드 세 곳에 있습니다.
 - `MbRecordDone`은 `tertiary` 자리에 둡니다. `primary`(노랑)와 따로 조절할 수 있어야 노란 버튼 하나 규칙이 유지됩니다.
 - `MbError`는 입력 오류 같은 에러 상태에만 씁니다. 기록 칸이나 미달성 표시에는 쓰지 않습니다(1.1).
 - `dynamicColor`는 기본값 `false`입니다. 기기 배경화면 색을 따라가지 않습니다.
-- 위 14색은 Figma 변수(`MB Palette` → 역할 변수 `MB Color`)로 등록해 2차 시안 전체에 적용했고, 시안을 [#41에 올렸습니다](https://github.com/myaring/mobile-butler/issues/41#issuecomment-6444659200). #41에서 확인되면 **확정**으로 바꿉니다.
+- 위 16색은 Figma 변수(`MB Palette` → 역할 변수 `MB Color`)로 등록해 2차 시안 전체에 적용했고, 시안을 [#41에 올렸습니다](https://github.com/myaring/mobile-butler/issues/41#issuecomment-6444659200). #41에서 확인되면 **확정**으로 바꿉니다.
+- `MbSecondaryContainer`(내비게이션 바 선택 표시)와 `MbInversePrimary`(스낵바 액션)는 [PR #46](https://github.com/myaring/mobile-butler/pull/46) 리뷰에서 더한 두 색입니다. Figma `MB Palette`에서는 `제안/` 그룹에 있습니다.
+- 팔레트에 따로 두지 않고 같은 색을 다른 역할에도 둡니다: `inverseSurface` = `MbOnSurface`, `inverseOnSurface` = `MbSurfaceContainer`(스낵바), `onSecondaryContainer` = `MbOnSurface`, `surfaceContainerHigh`·`surfaceContainerHighest` = `MbSurfaceVariant`(기본 `Card`·시트 배경). 전체 대응은 `ui/theme/Theme.kt`를 따릅니다.
+- M3 기본 색이 시안과 다른 두 곳은 화면 코드에서 색을 지정합니다 **(임시, PR #46)**
+  - `ModalBottomSheet`(T-02 기록 시트): 기본 `surfaceContainerLow`가 배경과 같은 색이라 `containerColor = surfaceContainerHigh`
+  - `ExtendedFloatingActionButton`(G-01 "목표 추가"): 기본 `primaryContainer`가 남색이라 `containerColor = primary`
 
 기록 칸 보조 색 **(임시, #41)**
 
@@ -377,6 +384,8 @@ Figma 2차 시안 페이지 아래쪽 보드 세 곳에 있습니다.
 | 간격 | 4 · 8 · 12 · 16 · 24 | `MbSpacing.*` | 확정 |
 | 모서리 | 4 · 12 · 16 · 28 · full | `MaterialTheme.shapes.*` | 확정 |
 | 글꼴 | Noto Sans KR, M3 타입 스케일(displaySmall ~ labelSmall) | `MaterialTheme.typography.*` | 확정 |
+
+- 모서리 대응: `extraSmall` 4 · `small` 12 · `medium` 16 · `large` 28 · `extraLarge` 28. `extraLarge`를 50%로 두면 바텀 시트·다이얼로그·날짜 선택기가 크기에 비례해 둥글어지므로 28dp로 둡니다. 알약 모양(버튼, 내비게이션 선택 표시)은 쓰는 곳에서 `CircleShape`(또는 `MbRadius.full`)를 씁니다 ([PR #46](https://github.com/myaring/mobile-butler/pull/46))
 
 ---
 
@@ -437,7 +446,7 @@ flowchart TD
 
 | # | 질문 | 논의 |
 | --- | --- | --- |
-| 1 | 팔레트 14색과 기록 칸 보조 색(기록 없음, 옅은 채움, 테두리) 확정 | [#41](https://github.com/myaring/mobile-butler/issues/41) |
+| 1 | 팔레트 16색과 기록 칸 보조 색(기록 없음, 옅은 채움, 테두리) 확정 | [#41](https://github.com/myaring/mobile-butler/issues/41) |
 | 2 | 줄이기 목표 오늘 칸의 색, 하루 중 상한을 넘겼을 때의 오늘 칸 | [#40](https://github.com/myaring/mobile-butler/issues/40) |
 | 3 | G-03 프리셋을 시즌 1에 넣을지 | — |
 | 4 | "수정"(G-03e)에서 마감일을 현재보다 앞당길 수 있게 할지 | — |
@@ -460,3 +469,4 @@ flowchart TD
 | --- | --- |
 | 2026-10-27 | 초안 작성. 화면설계서 v0.2와 2차 시안 설명서를 합치고, #35~#41 결정을 반영. 화면설계서는 `draft/UI.md`로 이동 |
 | 2026-10-28 | Figma에 새로 그린 화면(T-01b·c, T-04·b, G-02b~d, G-03·b~f, G-04·b·c, S-01)을 화면 목록과 흐름도에 추가. 접힌 카드 `기록` 버튼 유지, `DEADLINE` 태그 "잠시 덮어둠", 마감일 연장 = 현재 마감일 뒤로만을 확정. 마감 지남 팝업은 처음 한 번만(#44 `overdueNoticeShown`), 보관함 목표 삭제는 미정(#48)으로 고침. 기록 칸 보조 색은 임시(#41). G-02 끝내기 태그를 마감 전·후로 나눠 적고, "임시" 정의를 넓히고, 8.3에 `overdueNoticeShown` 추가 |
+| 2026-10-28 | PR #46 수정본 반영: 7.1에 `MbSecondaryContainer`·`MbInversePrimary`(16색)와 재사용 역할, 바텀 시트·"목표 추가" 버튼 색 지정(임시). 7.2에 모서리 대응(`extraLarge` 28dp) |
