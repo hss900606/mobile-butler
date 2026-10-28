@@ -4,7 +4,7 @@
 >
 > 기준일: 2026-10-28 · 정리: hss900606
 >
-> 합친 문서: [DB 설계 초안](draft/db_draft.md) (PR [#32], [#51]), [기능 정의 초안](draft/hss900606_draft.md) 4장 · 3.3, 논의 이슈 [#35] · [#36] · [#38] · [#39] · [#40], 개발 이슈 [#44] · [#45] · [#48]
+> 합친 문서: [DB 설계 초안](draft/db_draft.md) (PR [#32], [#51]), [기능 정의 초안](draft/hss900606_draft.md) 4장 · 3.3, 논의 이슈 [#35] · [#36] · [#38] · [#39] · [#40] · [#52], 개발 이슈 [#44] · [#45] · [#48]
 
 ## 문서 안내
 
@@ -94,8 +94,12 @@
 | `id` | `String` | PK. UUID 문자열 |
 | `goalId` | `String` | FK → `Goal.id` |
 | `recordedAt` | `Instant` | 기록 시각 |
+| `recordedOffset` | `ZoneOffset` | 기록할 때 기기 시간대의 UTC offset (예: `+09:00`). **확정 ([#52])** |
 | `amount` | `Double` | 기록한 양. `0`보다 커야 함 |
 | `source` | `EntrySource` | `MANUAL` 고정 |
+
+- 기록의 날짜는 `recordedAt`을 **기록할 때의 offset**으로 바꾼 로컬 날짜입니다 (`recordedAt.atOffset(recordedOffset).toLocalDate()`). 나중에 기기 시간대가 바뀌어도 이미 칠해진 칸은 옮겨지지 않습니다. **확정 ([#52])**
+- 사용자가 기록을 고칠 때 바꾸는 것은 **날짜**입니다. 기록할 때의 로컬 시각과 `recordedOffset`은 그대로 두고 날짜만 바꿔 `recordedAt`을 다시 계산합니다. **확정 ([#52])**
 
 - `Goal` 1 : N `ProgressEntry`입니다. 같은 날 아침 5쪽, 저녁 10쪽을 기록하면 **두 건**으로 남깁니다.
 - 마감이 지났지만 아직 `ACTIVE`인 목표에도 기록을 받습니다. **확정 ([#39])**
@@ -255,9 +259,10 @@ fun phaseOf(goal: Goal, today: LocalDate): GoalPhase {
 
 | 규칙 | 상태 |
 | --- | --- |
-| 기록 날짜와 "오늘"은 기기 시간대의 로컬 날짜(00시 기준)로 셉니다 | 임시 ([#40]에서 오늘 칸 기준으로 정함, 기록 전체 기준은 DB 초안 9장 제안) |
+| "오늘"은 **지금** 기기 시간대의 로컬 날짜(00시 기준)입니다 | 확정 ([#40], [#52]) |
+| 기록의 날짜는 **기록할 때의** 시간대(`recordedOffset`)로 셉니다. 지금 기기 시간대로 다시 계산하지 않습니다 (3.2) | 확정 ([#52]) |
+| `startDate`, `dueDate`, `endedAt`은 `LocalDate`라 시간대와 관계없습니다 | 확정 ([#44]) |
 | 계산 함수는 `Clock`을 받아 씁니다 | 임시 ([#45]) |
-| 기기 시간대가 바뀌었을 때 이미 저장한 기록을 어느 날짜로 볼지. `recordedAt`은 `Instant`라, 보여줄 때 날짜를 계산하면 기록이 다른 날로 옮겨 보일 수 있습니다 | 미정 ([#52]) |
 
 ---
 
@@ -278,7 +283,7 @@ fun phaseOf(goal: Goal, today: LocalDate): GoalPhase {
 | 규칙 | 상태 |
 | --- | --- |
 | Room Entity는 도메인 모델과 분리하고 mapper로 변환합니다 | 임시 ([#48]) |
-| `LocalDate` ↔ `YYYY-MM-DD` 문자열, `Instant` ↔ epoch ms `Long`, enum ↔ `name` 문자열 | 임시 ([#48]) |
+| `LocalDate` ↔ `YYYY-MM-DD` 문자열, `Instant` ↔ epoch ms `Long`, `ZoneOffset` ↔ 초 단위 `Int`(`totalSeconds`), enum ↔ `name` 문자열 | 임시 ([#48]) |
 | `Set<DayOfWeek>` 저장 형식(문자열 / 비트마스크) | 미정 ([#48]) |
 | FK `progress_entries.goalId → goals.id`. `ON DELETE CASCADE`는 쓰지 않습니다 | 임시 ([#48]) |
 | 인덱스 `goals(status, priority)`, `progress_entries(goalId, recordedAt)` | 임시 ([#48]) |
@@ -323,7 +328,6 @@ fun phaseOf(goal: Goal, today: LocalDate): GoalPhase {
 | 4 | 지난 날짜의 할 몫을 그날 값으로 고정할지 | [#45] |
 | 5 | 목표 영구 삭제 허용 여부와 기록 처리, FK 삭제 방식 | [#48] |
 | 6 | `Set<DayOfWeek>` 저장 형식 | [#48] |
-| 7 | 기기 시간대가 바뀌었을 때의 기록 날짜, `ProgressEntry`에 날짜 필드를 둘지 | [#52] |
 
 ---
 
@@ -333,6 +337,7 @@ fun phaseOf(goal: Goal, today: LocalDate): GoalPhase {
 | --- | --- |
 | 2026-10-27 | 초안 작성. DB 설계 초안과 #35·#36·#38·#39·#40 결정, #44·#45·#48 완료 조건을 반영. #39 상태 전이표 6행 오타(`COMPELTED`)와 6·8행 `endedAt`(마감일 → 사용자가 고른 날)을 고침 |
 | 2026-10-28 | `EndReason`별 보관함 태그 문구(달성 / 잠시 덮어둠 / 조기 종료)를 적음. "임시" 정의를 디자인과 맞추고, `unit` 예시 "걸음" → "보" |
+| 2026-10-28 | [#52] 결정(C안) 반영: `ProgressEntry.recordedOffset` 추가, 기록 날짜는 기록할 때의 시간대로 계산, 기록 수정은 날짜만. 5.3 날짜 기준과 7장 저장 형식 갱신, 10장 미정 7번 삭제 |
 
 [#32]: https://github.com/myaring/mobile-butler/pull/32
 [#51]: https://github.com/myaring/mobile-butler/pull/51
