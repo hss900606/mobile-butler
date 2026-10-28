@@ -50,3 +50,4 @@
 | 2026-10-27 | hss900606 | 디자인·데이터 모델 정본 작성 (`design.md`, `data_model.md`), 화면설계서 draft로 이동 | [상세](2026-10-27-canonical-docs-and-figma.md) |
 | 2026-10-27 | hss900606 | Figma 2차 시안에 #41 팔레트 변수 적용, 이슈별 화면 추가(21개), 프로토타입 연결     | [상세](2026-10-27-canonical-docs-and-figma.md) |
 | 2026-10-28 | hss900606 | Figma 상세 수정(마감일 연장 화면 등), 정본에 Figma 결과·결정 반영                 | [상세](2026-10-27-canonical-docs-and-figma.md) |
+| 2026-10-28 | yuhan3958 | Material 3 기반 다크 테마 구현. | [설명서](2026-10-28-A1.md) |
